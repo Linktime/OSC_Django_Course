@@ -5,6 +5,11 @@ from django.template import Template,Context
 from django.shortcuts import render_to_response
 from datetime import datetime
 
+from django.template import RequestContext
+
+from firstapp.models import OSCUser
+from firstapp.forms import OSCUserForm,OSCUserModelForm
+
 def index(request):
     # 硬编码
 
@@ -22,7 +27,7 @@ def diy_tpl(request):
 
 def load_tpl(request):
     # 用IO流读取
-    f = open("F:\\Freedom\\ces\\osc\\templates\\index.tpl","r")
+    f = open("F:\\Freedom\\ces\\osc\\templates\\index.tpl","r") # 更改站点目录时必须更改
     t = Template(f.read())
     f.close()
     mylist = [i for i in range(1,11)]
@@ -40,3 +45,49 @@ def simple_tpl(request):
     #还有更简洁的吗?
 
     return render_to_response('child.tpl',{'list':[i for i in range(10)],'time':time})
+
+def simple_form(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        sex = request.POST.get('sex')
+        email = request.POST.get('email')
+        blog = request.POST.get('blog')
+        age = request.POST.get('age')
+        # Do something
+
+        # osc_user = OSCUser.objects.create(name=name,sex=sex,email=email,blog=blog,age=age)
+        try :
+            osc_user = OSCUser.objects.create(**request.POST)
+        except OSCUser.DoesNotExist:
+            pass
+        return render_to_response('success.tpl')
+    else :
+        return render_to_response('simple_form.tpl',context_instance=RequestContext(request))
+
+def django_form(request):
+    if request.method == 'POST':
+        form = OSCUserForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            sex = form.cleaned_data['sex']
+            email = form.cleaned_data['email']
+            blog = form.cleaned_data['blog']
+            age = form.cleaned_data['age']
+            try :
+                osc_user = OSCUser.objects.create(**request.GET)
+            except OSCUser.DoesNotExist:
+                pass
+            return render_to_response('success.tpl')
+    else:
+        form = OSCUserForm()
+    return render_to_response('django_form.tpl',{'form':form},context_instance=RequestContext(request))
+
+def django_modelform(request):
+    if request.method == 'POST':
+        form = OSCUserModelForm(request.POST)
+        if form.is_valid():
+            osc_user = form.save(submit=False)
+            return render_to_response('success.tpl')
+    else:
+        form = OSCUserModelForm()
+        return render_to_response('django_modelform.tpl',{'form':form},context_instance=RequestContext(request))

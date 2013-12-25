@@ -4,11 +4,15 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
+
 urlpatterns = patterns('',
     url(r'^$','views.index'),
     url(r'^tpl/$','views.diy_tpl'),
     url(r'^load_tpl/$','views.load_tpl'),
     url(r'^simple_tpl/$','views.simple_tpl'),
+    url(r'^simple_form/$','views.simple_form'),
+    url(r'^django_form/$','views.django_form',name="django_form"),
+    url(r'^django_modelform/$','views.django_modelform'),
     # Examples:
     # url(r'^$', 'osc.views.home', name='home'),
     # url(r'^osc/', include('osc.foo.urls')),
